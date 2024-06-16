@@ -1,0 +1,48 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Data Set Selection
+
+data_set_path = 'insurance_data.csv'
+data = pd.read_csv(data_set_path)
+
+# Data Loading
+df = pd.DataFrame(data)
+
+# Data Exploration
+print("Data Structure:")
+print(df.info())
+
+print("\nFeatures:")
+print(df.columns)
+
+print("\nStatistical Summary:")
+print(df.describe())
+
+# Data Cleaning
+# Handling missing values
+df = df.dropna()  # This removes rows with missing values. You may choose other methods.
+
+# Removing duplicates
+df = df.drop_duplicates()
+
+# Data Transformation (if necessary)
+# Example: Converting a column to a different data type
+# df['column_name'] = df['column_name'].astype('new_type')
+
+# Data Visualization
+# Histogram
+plt.figure(figsize=(10, 6))
+sns.histplot(df['age'], kde=True)
+plt.title('age')
+plt.show()
+
+# Scatter Plot
+plt.figure(figsize=(10, 6))
+sns.scatterplot(x='age', y='bought_insurance', data=df)
+plt.title('Scatter Plot between column_x and column_y')
+plt.show()
+
+# Analysis and Insights
+# After each visualization, write down your analysis and insights here.
