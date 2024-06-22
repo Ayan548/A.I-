@@ -1,48 +1,68 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import requests
+import io
 
-# Data Set Selection
+# URL of the Titanic dataset (from a public source)
+url = "https://web.stanford.edu/class/archive/cs/cs109/cs109.1166/stuff/titanic.csv"
 
-data_set_path = 'insurance_data.csv'
-data = pd.read_csv(data_set_path)
+# Download the dataset
+response = requests.get(url)
+if response.status_code == 200:
+    print("Dataset downloaded successfully")
+    data = io.StringIO(response.text)
+else:
+    print("Failed to download the dataset")
+    data = None
 
-# Data Loading
-df = pd.DataFrame(data)
+# Load the dataset into a DataFrame
+if data:
+    df = pd.read_csv(data)
 
-# Data Exploration
-print("Data Structure:")
-print(df.info())
+    # Data Exploration
+    print(df.head())
+    print(df.info())
+    print(df.describe())
 
-print("\nFeatures:")
-print(df.columns)
+    # Data Cleaning
+    df_cleaned = df.dropna()
+    df_cleaned = df_cleaned.drop_duplicates()
+    print(df_cleaned.info())
 
-print("\nStatistical Summary:")
-print(df.describe())
+    # Data Visualization
+    sns.set(style="whitegrid")
 
-# Data Cleaning
-# Handling missing values
-df = df.dropna()  # This removes rows with missing values. You may choose other methods.
+    # Histogram of Age
+    plt.figure(figsize=(10, 6))
+    df_cleaned['Age'].hist(bins=30)
+    plt.title('Age Distribution')
+    plt.xlabel('Age')
+    plt.ylabel('Frequency')
+    plt.show()
 
-# Removing duplicates
-df = df.drop_duplicates()
+    # Scatter plot of Age vs. Fare
+    plt.figure(figsize=(10, 6))
+    plt.scatter(df_cleaned['Age'], df_cleaned['Fare'], alpha=0.5)
+    plt.title('Age vs. Fare')
+    plt.xlabel('Age')
+    plt.ylabel('Fare')
+    plt.show()
 
-# Data Transformation (if necessary)
-# Example: Converting a column to a different data type
-# df['column_name'] = df['column_name'].astype('new_type')
+    # Box plot of Fare by Class
+    plt.figure(figsize=(10, 6))
+    sns.boxplot(x='Pclass', y='Fare', data=df_cleaned)
+    plt.title('Fare by Passenger Class')
+    plt.xlabel('Passenger Class')
+    plt.ylabel('Fare')
+    plt.show()
 
-# Data Visualization
-# Histogram
-plt.figure(figsize=(10, 6))
-sns.histplot(df['age'], kde=True)
-plt.title('age')
-plt.show()
-
-# Scatter Plot
-plt.figure(figsize=(10, 6))
-sns.scatterplot(x='age', y='bought_insurance', data=df)
-plt.title('Scatter Plot between column_x and column_y')
-plt.show()
-
-# Analysis and Insights
-# After each visualization, write down your analysis and insights here.
+    # Heatmap of correlation matrix
+    plt.figure(figsize=(10, 6))
+    # Select only numerical columns for correlation calculation
+    numerical_df = df_cleaned.select_dtypes(include=['float', 'int'])  
+    sns.heatmap(numerical_df.corr(), annot=True, cmap='coolwarm')
+    plt.title('Correlation Matrix')
+    plt.show()
+else:
+    print("No data to process")
