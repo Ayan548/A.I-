@@ -1,0 +1,90 @@
+Task 1: 
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+
+# Load dataset
+# For example, using Iris dataset from sklearn
+from sklearn.datasets import load_iris
+data = load_iris()
+X = data.data
+y = data.target
+
+# Split dataset
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Train model
+model = LogisticRegression(max_iter=200)
+model.fit(X_train, y_train)
+
+# Predict
+y_pred = model.predict(X_test)
+
+# Calculate metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred, average='weighted')
+recall = recall_score(y_test, y_pred, average='weighted')
+f1 = f1_score(y_test, y_pred, average='weighted')
+
+print(f"Accuracy: {accuracy}")
+print(f"Precision: {precision}")
+print(f"Recall: {recall}")
+print(f"F1-Score: {f1}")
+============================================================================================================================================================================================
+Task 2:
+from sklearn.metrics import confusion_matrix
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Generate confusion matrix
+cm = confusion_matrix(y_test, y_pred)
+
+# Plot confusion matrix
+sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
+plt.xlabel('Predicted')
+plt.ylabel('Actual')
+plt.show()
+============================================================================================================================================================================================
+Task 3:
+from sklearn.metrics import roc_curve, auc
+from sklearn.preprocessing import label_binarize
+
+# Binarize the output
+y_test_bin = label_binarize(y_test, classes=[0, 1, 2])
+y_pred_bin = label_binarize(y_pred, classes=[0, 1, 2])
+
+# Compute ROC curve and ROC area for each class
+fpr = dict()
+tpr = dict()
+roc_auc = dict()
+for i in range(3):
+    fpr[i], tpr[i], _ = roc_curve(y_test_bin[:, i], y_pred_bin[:, i])
+    roc_auc[i] = auc(fpr[i], tpr[i])
+
+# Plot ROC curve
+plt.figure()
+for i in range(3):
+    plt.plot(fpr[i], tpr[i], label=f'Class {i} (area = {roc_auc[i]:.2f})')
+plt.plot([0, 1], [0, 1], 'k--')
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver Operating Characteristic')
+plt.legend(loc="lower right")
+plt.show()
+============================================================================================================================================================================================
+Task 4:
+from sklearn.model_selection import cross_val_score
+
+# Perform k-fold cross-validation
+k = 5
+cv_scores = cross_val_score(model, X, y, cv=k, scoring='accuracy')
+
+# Report mean and standard deviation
+mean_accuracy = cv_scores.mean()
+std_accuracy = cv_scores.std()
+
+print(f"Mean Accuracy: {mean_accuracy}")
+print(f"Standard Deviation of Accuracy: {std_accuracy}")
